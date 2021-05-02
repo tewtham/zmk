@@ -41,6 +41,32 @@ ZMK is currently missing some features found in other popular firmware. This tab
 | Realtime Keymap Updating                                                                                                           | 💡  |           | ✅  |
 | AVR/8 Bit                                                                                                                          |     |           | ✅  |
 | [Wide Range of ARM Chips Supported](https://docs.zephyrproject.org/latest/boards/index.html)                                       | ✅  |           |     |
+| **Feature**                                                                                                               | ZMK | BlueMicro | QMK |
+| ------------------------------------------------------------------------------------------------------------------------- | :-: | :-------: | :-: |
+| Low Latency BLE Support                                                                                                   | ✅  |    ✅     |     |
+| Multi-Device BLE Support                                                                                                  | ✅  |           |     |
+| [USB Connectivity](behaviors/outputs)                                                                                     | ✅  |    ✅     | ✅  |
+| User Configuration Repositories                                                                                           | ✅  |           |     |
+| Split Keyboard Support                                                                                                    | ✅  |    ✅     | ✅  |
+| [Keymaps and Layers](behaviors/layers)                                                                                    | ✅  |    ✅     | ✅  |
+| [Hold-Tap](behaviors/hold-tap) (which includes [Mod-Tap](behaviors/mod-tap) and [Layer-Tap](behaviors/layers/#layer-tap)) | ✅  |    ✅     | ✅  |
+| [Keyboard Codes](codes/#keyboard)                                                                                         | ✅  |    ✅     | ✅  |
+| [Media](codes/#media-controls) & [Consumer](codes/#consumer-controls) Codes                                               | ✅  |    ✅     | ✅  |
+| [Encoders](features/encoders)[^1]                                                                                         | ✅  |    ✅     | ✅  |
+| [Display Support](features/displays)[^2]                                                                                  | 🚧  |    🚧     | ✅  |
+| [RGB Underglow](features/underglow)                                                                                       | ✅  |    ✅     | ✅  |
+| One Shot Keys                                                                                                             | ✅  |    ✅     | ✅  |
+| [Combo Keys](features/combos)                                                                                             | ✅  |           | ✅  |
+| Macros                                                                                                                    | 🚧  |    ✅     | ✅  |
+| Mouse Keys                                                                                                                | ✅  |    ✅     | ✅  |
+| Low Active Power Usage                                                                                                    | ✅  |           |     |
+| Low Power Sleep States                                                                                                    | ✅  |    ✅     |     |
+| [Low Power Mode (VCC Shutoff)](behaviors/power)                                                                           | ✅  |    ✅     |     |
+| Battery Reporting                                                                                                         | ✅  |    ✅     |     |
+| Shell over BLE                                                                                                            | 💡  |           |     |
+| Realtime Keymap Updating                                                                                                  | 💡  |           | ✅  |
+| AVR/8 Bit                                                                                                                 |     |           | ✅  |
+| [Wide Range of ARM Chips Supported](https://docs.zephyrproject.org/latest/boards/index.html)                              | ✅  |           |     |
 
 [^2]: Encoders are not currently supported on peripheral side splits.
 [^1]: OLEDs are currently proof of concept in ZMK.
