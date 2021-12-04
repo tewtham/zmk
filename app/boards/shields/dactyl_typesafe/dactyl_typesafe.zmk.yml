@@ -1,0 +1,14 @@
+file_format: "1"
+id: dactyl_typesafe
+name: DactylTypesafe
+type: shield
+url: https://github.com/tewtham/dactyl-typesafe
+requires: [pro_micro]
+exposes: [i2c_oled]
+features:
+  - keys
+  - display
+  - encoder
+siblings:
+  - dactyl_typesafe_left
+  - dactyl_typesafe_right
