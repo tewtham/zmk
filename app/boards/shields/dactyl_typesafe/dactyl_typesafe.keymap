@@ -6,6 +6,7 @@
 
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/mouse.h>
 #include <dt-bindings/zmk/bt.h>
 
 / {
@@ -14,34 +15,34 @@
 
 		default_layer {
 			bindings = <
-&kp ESC   &kp Q     &kp W     &kp E     &kp R     &kp T                 &kp Y            &kp U     &kp I     &kp O    &kp P     &kp BSLH
-&kp MINUS &kp A     &kp S     &kp D     &kp F     &kp G                 &kp H            &kp J     &kp K     &kp L    &kp SEMI  &kp SQT
-&kp TAB   &kp Z     &kp X     &kp C     &kp V     &kp B                 &kp N            &kp M     &kp COMMA &kp DOT  &kp FSLH  &kp RCTRL
-		  &kp LSHFT &kp GRAVE &kp EQUAL &kp LALT  &kp LCTRL             &kp K_PLAY_PAUSE &kp LBKT  &kp RBKT  &kp RALT &kp RSHFT
-										&kp BSPC  &kp SPACE &kp DEL     &mo 1            &kp ENTER &kp END
+&kp ESC   &kp Q     &kp W     &kp E     &kp R     &kp T                        &kp Y      &kp U     &kp I     &kp O     &kp P     &kp BSLH
+&kp MINUS &kp A     &kp S     &kp D     &kp F     &kp G                        &kp H      &kp J     &kp K     &kp L     &kp SEMI  &kp SQT
+&kp TAB   &kp Z     &kp X     &kp C     &kp V     &kp B                        &kp N      &kp M     &kp COMMA &kp DOT   &kp FSLH  &kp RCTRL
+&kp LSHFT &kp GRAVE &kp EQUAL &kp LALT                                                              &kp LBKT  &kp RBKT  &kp RALT  &kp RSHFT
+										&kp BSPC  &kp SPACE &kp DEL     &mo 1  &kp ENTER  &kp END
 							  &kp LALT  &kp LCTRL &kp LSHFT &kp GUI
 			>;
 		};
 
 		lower_layer {
 			bindings = <
-&kp ESC   &kp BANG  &kp ATSN  &kp HASH  &kp DLLR  &kp PRCT              &kp CRRT         &kp AMPS  &kp STAR  &kp LPAR &kp RPAR  &kp BSLH
-&kp MINUS &kp N1    &kp N2    &kp N3    &kp N4    &kp N5                &kp N6           &kp N7    &kp N8    &kp N9   &kp N0    &kp SQT
-&kp TAB   &kp Z     &kp X     &kp C     &kp V     &kp B                 &kp N            &kp M     &kp COMMA &kp DOT  &kp FSLH  &kp RCTRL
-		  &kp LSHFT &kp GRAVE &kp EQUAL &kp LALT  &kp LCTRL             &kp RALT         &kp LBKT  &kp RBKT  &kp RALT &kp RSHFT
-										&kp BSPC  &kp SPACE &kp DEL     &kp RSHFT        &kp ENTER &kp END
-							  &kp LALT  &kp LCTRL &kp LSHFT &kp GUI
+&trans    &kp BANG  &kp ATSN  &kp HASH  &kp DLLR  &kp PRCT                      &kp CRRT &kp AMPS  &kp STAR  &kp LPAR  &kp RPAR  &trans
+&trans    &kp N1    &kp N2    &kp N3    &kp N4    &kp N5                        &kp N6   &kp N7    &kp N8    &kp N9    &kp N0    &trans
+&trans    &trans    &trans    &trans    &trans    &trans                        &trans   &trans    &trans    &trans    &trans    &trans
+&trans    &trans    &trans    &trans                                                               &trans    &trans    &trans    &trans
+										&trans    &trans   &trans    &kp RSHFT  &trans   &trans
+							  &trans    &trans    &trans   &trans
 			>;
 		};
 
 		raise_layer {
 			bindings = <
-&kp ESC   &kp Q     &kp W     &kp UP    &kp R     &kp T                 &kp Y            &kp U     &kp I     &kp O    &kp P     &kp BSLH
-&kp MINUS &kp A     &kp LEFT  &kp DOWN  &kp RIGHT &kp G                 &kp N0           &kp J     &kp K     &kp L    &kp SEMI  &kp SQT
-&kp TAB   &kp Z     &kp X     &kp C     &kp V     &kp B                 &kp N            &kp M     &kp COMMA &kp DOT  &kp FSLH  &kp RCTRL
-		  &kp LSHFT &kp GRAVE &kp EQUAL &kp LALT  &kp LCTRL             &kp RALT         &kp LBKT  &kp RBKT  &kp RALT &kp RSHFT
-										&kp BSPC  &kp SPACE &kp DEL     &kp RSHFT        &kp ENTER &kp END
-							  &kp LALT  &kp LCTRL &kp LSHFT &kp GUI
+&trans    &trans    &trans    &kp UP    &trans    &trans                        &kp CRRT &trans    &trans    &trans    &trans   &trans
+&trans    &trans    &kp LEFT  &kp DOWN  &kp RIGHT &trans                        &kp N6   &mkp LCLK &mkp MCLK &mkp RCLK &trans    &trans
+&trans    &trans    &trans    &trans    &trans    &trans                        &trans   &trans    &trans    &trans    &trans    &trans
+&trans    &trans    &trans    &trans                                                               &trans    &trans    &trans    &trans
+										&trans    &trans   &trans    &kp RSHFT  &trans   &trans
+							  &trans    &trans    &trans   &trans
 			>;
 		};
 	};

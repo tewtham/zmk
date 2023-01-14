@@ -7,8 +7,7 @@ requires: [pro_micro]
 exposes: [i2c_oled]
 features:
   - keys
-  - display
-  - encoder
+  - mouse
 siblings:
   - dactyl_typesafe_left
   - dactyl_typesafe_right
