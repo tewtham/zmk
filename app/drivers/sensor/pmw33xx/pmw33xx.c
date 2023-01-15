@@ -23,7 +23,7 @@
 
 #include "pmw33xx.h"
 
-LOG_MODULE_REGISTER(PMW33XX, CONFIG_SENSOR_LOG_LEVEL);
+LOG_MODULE_REGISTER(PMW33XX, CONFIG_ZMK_LOG_LEVEL);
 #define PMW33XX_PID COND_CODE_1(CONFIG_PMW33XX_3389, (PMW33XX_3389_PID), (PMW33XX_3360_PID))
 #define PMW33XX_CPI_MAX                                                                            \
     COND_CODE_1(CONFIG_PMW33XX_3389, (PMW33XX_3389_CPI_MAX), (PMW33XX_3360_CPI_MAX))
@@ -213,6 +213,10 @@ static int pmw33xx_sample_fetch(const struct device *dev, enum sensor_channel ch
     if (err) {
         return err;
     }
+
+    if (burst.dx != 0 || burst.dy != 0)
+        LOG_WRN("got something in the sample, %d, %d", burst.dx, burst.dy);
+
     if (chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_POS_DX)
         data->dx += burst.dx;
     if (chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_POS_DY)
@@ -285,18 +289,29 @@ static int pmw33xx_init_chip(const struct device *dev) {
         LOG_ERR("could not reset %d", err);
         return -EIO;
     }
+
     if (pid != PMW33XX_PID) {
         LOG_ERR("pid does not match expected: got (%x), expected(%x)", pid, PMW33XX_PID);
         return -EIO;
     }
-    pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG2,
-                      config->disable_rest ? 0x00 : PMW33XX_RESTEN); // set rest enable
+
+    struct pmw33xx_motion_burst val;
+    pmw33xx_read_motion_burst(dev, &val); // read and throwout initial motion data
+    uint8_t throw_away;
+    pmw33xx_read_reg(dev, PMW33XX_REG_DX_H, &throw_away);
+    pmw33xx_read_reg(dev, PMW33XX_REG_DX_L, &throw_away);
+    pmw33xx_read_reg(dev, PMW33XX_REG_DY_H, &throw_away);
+    pmw33xx_read_reg(dev, PMW33XX_REG_DY_L, &throw_away);
 
     err = pmw33xx_write_srom(dev);
     if (err) {
         LOG_ERR("could not upload srom %d", err);
         return -EIO;
     }
+
+    pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG2,
+                      config->disable_rest ? 0x00 : PMW33XX_RESTEN); // set rest enable
+
     uint8_t srom_run = 0x0;
     err = pmw33xx_read_reg(dev, PMW33XX_REG_OBSERVATION, &srom_run);
     if (err) {
@@ -320,8 +335,6 @@ static int pmw33xx_init_chip(const struct device *dev) {
     }
 
     pmw33xx_write_reg(dev, PMW33XX_REG_BURST, 0x01);
-    struct pmw33xx_motion_burst val;
-    pmw33xx_read_motion_burst(dev, &val); // read and throwout initial motion data
 
     if (config->cpi > PMW33XX_CPI_MIN && config->cpi < PMW33XX_CPI_MAX)
         return pmw33xx_set_cpi(dev, config->cpi);

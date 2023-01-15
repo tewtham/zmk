@@ -5,6 +5,7 @@
  */
 
 #include "dactyl_typesafe.dtsi"
+#include <dt-bindings/zmk/pmw33xx.h>
 
 &default_transform {
 	col-offset = <6>;
@@ -19,4 +20,28 @@
 		, <&pro_micro 7 GPIO_ACTIVE_HIGH>
 		, <&pro_micro 8 GPIO_ACTIVE_HIGH>
 		;
+};
+
+&spi1 {
+	compatible = "nordic,nrf-spim";
+	status = "okay";
+	mosi-pin = <10>;
+	sck-pin = <45>;
+	miso-pin = <43>;
+	cs-gpios = <&pro_micro 4 GPIO_ACTIVE_LOW>;
+
+	trackball: pmw33xx@0 { 
+		compatible = "pixart,pmw33xx";
+		reg = <0x0>;
+		label = "PMW33XX";
+		motswk-gpios = <&pro_micro 9 GPIO_ACTIVE_HIGH>;
+		cs-gpios = <&pro_micro 4 GPIO_ACTIVE_LOW>;
+		spi-max-frequency = <4000000>;
+	};
+};
+
+/ {
+	chosen {
+		zmk,pmw33xx = &trackball;
+	};
 };

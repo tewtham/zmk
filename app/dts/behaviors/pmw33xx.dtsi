@@ -1,0 +1,56 @@
+/*
+ * Copyright (c) 2021 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <dt-bindings/zmk/pmw33xx.h>
+
+/ {
+	behaviors {
+		/omit-if-no-ref/ pmw33xx_move: behavior_pmw33xx_move {
+			compatible = "zmk,behavior-pmw33xx";
+			label = "PMW33XX_MOVE";
+			mode = <PMW33XX_MOVE>;
+			#binding-cells = <0>;
+		};
+
+		/omit-if-no-ref/ pmw33xx_scroll: behavior_pmw33xx_scroll {
+			compatible = "zmk,behavior-pmw33xx";
+			label = "PMW33XX_SCROLL";
+			mode = <PMW33XX_SCROLL>;
+			#binding-cells = <0>;
+		};
+
+		/omit-if-no-ref/ pmw33xx_toggle: behavior_pmw33xx_toggle {
+			compatible = "zmk,behavior-pmw33xx";
+			label = "PMW33XX_TOGGLE";
+			mode = <PMW33XX_TOGGLE>;
+			#binding-cells = <0>;
+		};
+
+		/omit-if-no-ref/ pmw33xx_move_scroll: behavior_pmw33xx_move_scroll {
+			compatible = "zmk,behavior-pmw33xx";
+			label = "PMW33XX_MOVE_SCROLL";
+			mode = <PMW33XX_MOVE>;
+			momentary;
+			#binding-cells = <0>;
+		};
+
+		/omit-if-no-ref/ pmw33xx_scroll_move: behavior_pmw33xx_scroll_move {
+			compatible = "zmk,behavior-pmw33xx";
+			label = "PMW33XX_SCROLL_MOVE";
+			mode = <PMW33XX_SCROLL>;
+			momentary;
+			#binding-cells = <0>;
+		};
+
+		/omit-if-no-ref/ pmw33xx_toggle_toggle: behavior_pmw33xx_toggle_toggle {
+			compatible = "zmk,behavior-pmw33xx";
+			label = "PMW33XX_TOGGLE_TOGGLE";
+			mode = <PMW33XX_TOGGLE>;
+			momentary;
+			#binding-cells = <0>;
+		};
+	};
+};

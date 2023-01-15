@@ -11,12 +11,28 @@ config ZMK_SPLIT_BLE_ROLE_CENTRAL
 
 endif
 
-if SHIELD_DACTYL_TYPESAFE_LEFT || SHIELD_DACTYL_TYPESAFE_RIGHT
+if SHIELD_DACTYL_TYPESAFE_RIGHT
 
-config ZMK_SPLIT
+config SPI
+	default y
+
+config SPI_1
 	default y
 
 config ZMK_MOUSE
+	default y
+
+config PMW33XX
+	default y
+
+endif
+
+if SHIELD_DACTYL_TYPESAFE_LEFT || SHIELD_DACTYL_TYPESAFE_RIGHT
+
+config ZMK_USB_LOGGING
+	default y
+
+config ZMK_SPLIT
 	default y
 
 endif

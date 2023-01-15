@@ -1,0 +1,15 @@
+# Copyright (c) 2021 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+description: Trackball PMW33XX behavior
+
+compatible: "zmk,behavior-pmw33xx"
+
+include: zero_param.yaml
+
+properties:
+  mode:
+    type: int
+    required: true
+  momentary:
+    type: boolean
