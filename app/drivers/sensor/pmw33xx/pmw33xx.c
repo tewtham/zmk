@@ -30,13 +30,6 @@ LOG_MODULE_REGISTER(PMW33XX, CONFIG_ZMK_LOG_LEVEL);
 #define PMW33XX_CPI_MIN                                                                            \
     COND_CODE_1(CONFIG_PMW33XX_3389, (PMW33XX_3389_CPI_MIN), (PMW33XX_3360_CPI_MIN))
 
-struct pmw33xx_motion_burst {
-    uint8_t motion;
-    uint8_t observation;
-    int16_t dx;
-    int16_t dy;
-} __attribute__((packed));
-
 static inline int pmw33xx_cs_select(const struct pmw33xx_gpio_dt_spec *cs_gpio_cfg,
                                     const uint8_t value) {
     return gpio_pin_set(cs_gpio_cfg->port, cs_gpio_cfg->pin, value);
@@ -142,43 +135,51 @@ static int pmw33xx_write_srom(const struct device *dev) {
     return err;
 }
 
-static int pmw33xx_read_motion_burst(const struct device *dev, struct pmw33xx_motion_burst *burst) {
+static void convertTwosComp(uint8_t b, int16_t *result) {
+  //Convert from 2's complement
+  if(b & 0x80){
+    b = -1 * ((b ^ 0xff) + 1);
+  }
+  *result = b;
+}
+
+static int pmw33xx_read_motion(const struct device *dev, int16_t *dx, int16_t *dy) {
     struct pmw33xx_data *data = dev->data;
     const struct pmw33xx_config *cfg = dev->config;
     const struct spi_config *spi_cfg = &cfg->bus_cfg.spi_cfg->spi_conf;
     const struct pmw33xx_gpio_dt_spec *cs_gpio_cfg = &cfg->bus_cfg.spi_cfg->cs_spec;
 
-    uint8_t access[1] = {PMW33XX_REG_BURST};
-    struct spi_buf_set tx = {
-        .buffers =
-            &(struct spi_buf){
-                .buf = access,
-                .len = 1,
-            },
-        .count = 1,
-    };
-    struct spi_buf_set rx = {
-        .buffers =
-            &(struct spi_buf){
-                .buf = (uint8_t *)burst,
-                .len = sizeof(struct pmw33xx_motion_burst),
-            },
-        .count = 1,
-    };
-
-    pmw33xx_cs_select(cs_gpio_cfg, 0);
-
-    int err = spi_write(data->bus, spi_cfg, &tx);
-    k_sleep(K_USEC(35)); // tsrad motbr
+    int err = pmw33xx_write_reg(dev, PMW33XX_REG_MOTION, 0x01);
     if (err) {
-        pmw33xx_cs_select(cs_gpio_cfg, 1);
         return err;
     }
-    err = spi_read(data->bus, spi_cfg, &rx);
-    pmw33xx_cs_select(cs_gpio_cfg, 1);
-#ifdef CONFIG_PMW33XX_TRIGGER
-    pmw33xx_reset_motion(dev);
-#endif
+
+    uint8_t high, low;
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_MOTION, &high);
+    if (err) {
+        return err;
+    }
+
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DX_L, &low);
+    if (err) {
+        return err;
+    }
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DX_H, &high);
+    if (err) {
+        return err;
+    }
+    *dx = (int16_t)(high<<8 | low);
+
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DY_L, &low);
+    if (err) {
+        return err;
+    }
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DY_H, &high);
+    if (err) {
+        return err;
+    }
+    *dy = (int16_t)(high<<8 | low);
+
     return err;
 }
 
@@ -204,23 +205,20 @@ int pmw33xx_spi_init(const struct device *dev) {
 
 static int pmw33xx_sample_fetch(const struct device *dev, enum sensor_channel chan) {
     struct pmw33xx_data *data = dev->data;
-    struct pmw33xx_motion_burst burst;
+    int16_t dx, dy;
 
     if (chan != SENSOR_CHAN_ALL && chan != SENSOR_CHAN_POS_DX && chan != SENSOR_CHAN_POS_DY)
         return -ENOTSUP;
 
-    int err = pmw33xx_read_motion_burst(dev, &burst);
+    int err = pmw33xx_read_motion(dev, &dx, &dy);
     if (err) {
         return err;
     }
 
-    if (burst.dx != 0 || burst.dy != 0)
-        LOG_WRN("got something in the sample, %d, %d", burst.dx, burst.dy);
-
     if (chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_POS_DX)
-        data->dx += burst.dx;
+        data->dx += dx;
     if (chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_POS_DY)
-        data->dy += burst.dy;
+        data->dy += dy;
     return 0;
 }
 
@@ -295,8 +293,8 @@ static int pmw33xx_init_chip(const struct device *dev) {
         return -EIO;
     }
 
-    struct pmw33xx_motion_burst val;
-    pmw33xx_read_motion_burst(dev, &val); // read and throwout initial motion data
+    int16_t a,b;
+    pmw33xx_read_motion(dev, &a, &b); // read and throwout initial motion data
     uint8_t throw_away;
     pmw33xx_read_reg(dev, PMW33XX_REG_DX_H, &throw_away);
     pmw33xx_read_reg(dev, PMW33XX_REG_DX_L, &throw_away);
