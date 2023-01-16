@@ -3,15 +3,15 @@
 
 if SHIELD_DACTYL_TYPESAFE_LEFT
 
+endif
+
+if SHIELD_DACTYL_TYPESAFE_RIGHT
+
 config ZMK_KEYBOARD_NAME
 	default "DactylTypesafe"
 
 config ZMK_SPLIT_BLE_ROLE_CENTRAL
 	default y
-
-endif
-
-if SHIELD_DACTYL_TYPESAFE_RIGHT
 
 config SPI
 	default y
