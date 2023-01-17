@@ -78,7 +78,6 @@ static void thread_code(void *p1, void *p2, void *p3)
                     int dy = pos_dy.val1;
                     zmk_hid_mouse_movement_set(dx, dy);
                     send_report = true;
-                    LOG_WRN("got something %d, %d", dx, dy);
                     clear = PMW33XX_MOVE;
                     break;
                 }
@@ -95,7 +94,6 @@ static void thread_code(void *p1, void *p2, void *p3)
         }
 
         if (send_report) {
-            LOG_WRN("sending the report");
             zmk_endpoints_send_mouse_report();
 
             switch (clear) {

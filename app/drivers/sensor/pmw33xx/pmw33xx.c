@@ -168,7 +168,7 @@ static int pmw33xx_read_motion(const struct device *dev, int16_t *dx, int16_t *d
     if (err) {
         return err;
     }
-    *dx = (int16_t)(high<<8 | low);
+    int16_t x = (int16_t)(high<<8 | low);
 
     err = pmw33xx_read_reg(dev, PMW33XX_REG_DY_L, &low);
     if (err) {
@@ -178,7 +178,11 @@ static int pmw33xx_read_motion(const struct device *dev, int16_t *dx, int16_t *d
     if (err) {
         return err;
     }
-    *dy = (int16_t)(high<<8 | low);
+    int16_t y = (int16_t)(high<<8 | low);
+
+    // apply bounds -127 - 127
+    *dx = MIN(MAX(x, -127), 127);
+    *dy = -1 * MIN(MAX(y, -127), 127);
 
     return err;
 }
