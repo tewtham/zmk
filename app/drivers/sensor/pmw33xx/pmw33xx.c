@@ -135,14 +135,6 @@ static int pmw33xx_write_srom(const struct device *dev) {
     return err;
 }
 
-static void convertTwosComp(uint8_t b, int16_t *result) {
-  //Convert from 2's complement
-  if(b & 0x80){
-    b = -1 * ((b ^ 0xff) + 1);
-  }
-  *result = b;
-}
-
 static int pmw33xx_read_motion(const struct device *dev, int16_t *dx, int16_t *dy) {
     struct pmw33xx_data *data = dev->data;
     const struct pmw33xx_config *cfg = dev->config;
