@@ -7,6 +7,9 @@ endif
 
 if SHIELD_DACTYL_TYPESAFE_RIGHT
 
+config ZMK_USB_LOGGING
+	default y
+
 config ZMK_KEYBOARD_NAME
 	default "DactylTypesafe"
 
@@ -28,9 +31,6 @@ config PMW33XX
 endif
 
 if SHIELD_DACTYL_TYPESAFE_LEFT || SHIELD_DACTYL_TYPESAFE_RIGHT
-
-config ZMK_USB_LOGGING
-	default y
 
 config ZMK_SPLIT
 	default y

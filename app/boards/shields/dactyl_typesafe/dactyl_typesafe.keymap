@@ -20,7 +20,6 @@
 &kp TAB   &kp Z     &kp X     &kp C     &kp V     &kp B                        &kp N      &kp M     &kp COMMA &kp DOT   &kp FSLH  &kp RCTRL
 &kp LSHFT &kp GRAVE &kp EQUAL &kp LALT                                                              &kp LBKT  &kp RBKT  &kp RALT  &kp RSHFT
 										&kp BSPC  &kp SPACE &kp DEL     &mo 1  &kp ENTER  &kp END
-							  &kp LALT  &kp LCTRL &kp LSHFT &kp GUI
 			>;
 		};
 
@@ -31,18 +30,16 @@
 &trans    &trans    &trans    &trans    &trans    &trans                        &trans   &trans    &trans    &trans    &trans    &trans
 &trans    &trans    &trans    &trans                                                               &trans    &trans    &trans    &trans
 										&trans    &trans   &trans    &kp RSHFT  &trans   &trans
-							  &trans    &trans    &trans   &trans
 			>;
 		};
 
 		raise_layer {
 			bindings = <
-&trans    &trans    &trans    &kp UP    &trans    &trans                        &kp CRRT &trans    &trans    &trans    &trans   &trans
-&trans    &trans    &kp LEFT  &kp DOWN  &kp RIGHT &trans                        &kp N6   &mkp LCLK &mkp MCLK &mkp RCLK &trans    &trans
+&trans    &trans    &trans    &kp UP    &trans    &trans                        &trans   &trans    &trans    &trans    &trans   &trans
+&trans    &trans    &kp LEFT  &kp DOWN  &kp RIGHT &trans                        &trans   &mkp LCLK &mkp MCLK &mkp RCLK &trans    &trans
 &trans    &trans    &trans    &trans    &trans    &trans                        &trans   &trans    &trans    &trans    &trans    &trans
 &trans    &trans    &trans    &trans                                                               &trans    &trans    &trans    &trans
 										&trans    &trans   &trans    &kp RSHFT  &trans   &trans
-							  &trans    &trans    &trans   &trans
 			>;
 		};
 	};
