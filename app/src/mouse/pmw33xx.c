@@ -9,6 +9,10 @@
 #include <zmk/hid.h>
 #include <zmk/endpoints.h>
 #include <zmk/pmw33xx.h>
+#include <zmk/keymap.h>
+#include <stdlib.h>
+
+#define LAYER_THRESHOLD 10
 
 LOG_MODULE_REGISTER(PMW33XX_MOUSE, CONFIG_ZMK_LOG_LEVEL);
 
@@ -94,6 +98,9 @@ static void thread_code(void *p1, void *p2, void *p3)
         }
 
         if (send_report) {
+            if (abs(pos_dx.val1) > LAYER_THRESHOLD || abs(pos_dy.val1) > LAYER_THRESHOLD) {
+                zmk_keymap_layer_to(2);
+            }
             zmk_endpoints_send_mouse_report();
 
             switch (clear) {
