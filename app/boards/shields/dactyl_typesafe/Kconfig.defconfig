@@ -3,12 +3,12 @@
 
 if SHIELD_DACTYL_TYPESAFE_LEFT
 
+config JOYSTICK
+	default y
+
 endif
 
 if SHIELD_DACTYL_TYPESAFE_RIGHT
-
-config ZMK_USB_LOGGING
-	default y
 
 config ZMK_KEYBOARD_NAME
 	default "DactylTypesafe"
@@ -33,6 +33,9 @@ endif
 if SHIELD_DACTYL_TYPESAFE_LEFT || SHIELD_DACTYL_TYPESAFE_RIGHT
 
 config ZMK_SPLIT
+	default y
+
+config ZMK_USB_LOGGING
 	default y
 
 endif

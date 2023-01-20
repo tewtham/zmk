@@ -16,3 +16,12 @@
 		, <&pro_micro 8 GPIO_ACTIVE_HIGH>
 		;
 };
+
+
+/ {
+	joystick {
+		compatible = "joystick";
+		label = "JOYSTICK";
+		io-channels = <&adc 31>, <&adc 29>;
+	};
+};
