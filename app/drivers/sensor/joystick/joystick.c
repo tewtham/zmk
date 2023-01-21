@@ -15,7 +15,6 @@
 #include <sys/__assert.h>
 #include <logging/log.h>
 #include <stdlib.h>
-#include <pm/device.h>
 #include "../../../include/drivers/ext_power.h"
 
 #include "joystick.h"
@@ -220,12 +219,12 @@ int joy_init(const struct device *dev) {
 #define JOY_INST(n)                                                                              \
     struct joy_data joy_data_##n;                                                                \
     const struct joy_config joy_cfg_##n = {                                                      \
-        .io_channel = DT_INST_IO_CHANNELS_INPUT(n),						 \
-        .adc = DEVICE_DT_GET(DT_IO_CHANNELS_CTLR(DT_DRV_INST(n))),                               \
-        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, resolution), (1), (DT_INST_PROP(n, resolution))),     \
-        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, min_on), (1), (DT_INST_PROP(n, min_on))),     \
-        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, frequency), (1), (DT_INST_PROP(n, frequency))),     \
-        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, reverse), (1), (DT_INST_PROP(n, reverse))),     \
+        .io_channel = DT_INST_IO_CHANNELS_INPUT(n),						                         \
+        .adc = DEVICE_DT_GET(DT_NODELABEL(adc)),                                                 \
+        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, resolution), (1), (DT_INST_PROP(n, resolution))),   \
+        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, min_on),     (1), (DT_INST_PROP(n, min_on))),       \
+        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, frequency),  (1), (DT_INST_PROP(n, frequency))),    \
+        COND_CODE_0(DT_INST_NODE_HAS_PROP(n, reverse),    (1), (DT_INST_PROP(n, reverse))),      \
     };                                                                                           \
     DEVICE_DT_INST_DEFINE(n, joy_init, device_pm_control_nop, &joy_data_##n, &joy_cfg_##n,       \
                           POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, &joy_driver_api);

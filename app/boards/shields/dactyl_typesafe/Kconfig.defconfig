@@ -6,6 +6,12 @@ if SHIELD_DACTYL_TYPESAFE_LEFT
 config JOYSTICK
 	default y
 
+config ADC
+	default y
+
+config ADC_ASYNC
+	default y
+
 endif
 
 if SHIELD_DACTYL_TYPESAFE_RIGHT
