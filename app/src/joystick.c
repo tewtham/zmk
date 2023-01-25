@@ -22,7 +22,7 @@ struct axis_state {
 
 LOG_MODULE_REGISTER(JOYSTICK_LOOP, CONFIG_ZMK_LOG_LEVEL);
 
-#define THRESHOLD 1000
+#define THRESHOLD 800
 
 static int do_work(const struct device *dev, struct axis_state *state, uint32_t low_key, uint32_t high_key) {
     struct sensor_value value;
@@ -50,7 +50,7 @@ static int do_work(const struct device *dev, struct axis_state *state, uint32_t 
         } else {
             state->lower = !state->lower;
         }
-        LOG_DBG("updating low %d, %d, %d", state->label, state->lower, low_key);
+        LOG_DBG("updating low %d, %s", state->label, state->lower ? "on" : "off");
     }
     
     if ((value.val1 > THRESHOLD) != state->higher) {
@@ -65,7 +65,7 @@ static int do_work(const struct device *dev, struct axis_state *state, uint32_t 
         } else {
             state->higher = !state->higher;
         }
-        LOG_DBG("updating high %d, %d, %d", state->label, state->higher, high_key);
+        LOG_DBG("updating high %d, %s", state->label, state->higher ? "on" : "off");
     }
 
     return 0;
@@ -107,7 +107,7 @@ static void thread_code(void *p1, void *p2, void *p3)
     while (true) {
         do_work(devx, &statex, xlow_key, xhigh_key);
         do_work(devy, &statey, ylow_key, yhigh_key);
-        k_sleep(K_MSEC(100));
+        k_sleep(K_MSEC(50));
     }
 }
 

@@ -38,7 +38,4 @@ if SHIELD_DACTYL_TYPESAFE_LEFT || SHIELD_DACTYL_TYPESAFE_RIGHT
 config ZMK_SPLIT
 	default y
 
-config ZMK_USB_LOGGING
-	default y
-
 endif

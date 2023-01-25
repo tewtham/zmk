@@ -238,6 +238,24 @@ static int pmw33xx_channel_get(const struct device *dev, enum sensor_channel cha
     return 0;
 }
 
+static int pmw33xx_attr_set(const struct device *dev, enum sensor_channel chan, enum sensor_attribute attr, const struct sensor_value *val) {
+    const struct pmw33xx_config *cfg = dev->config;
+    int err;
+    LOG_WRN("updating sensor attributes...");
+
+    switch (attr) {
+    case SENSOR_ATTR_SAMPLING_FREQUENCY:
+        LOG_DBG("setting resolution to %d", val->val1);
+        int err = pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG1, val->val1);
+        if (err) {
+            return err;
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 static const struct sensor_driver_api pmw33xx_driver_api = {
 #ifdef CONFIG_PMW33XX_TRIGGER
     .trigger_set = pmw33xx_trigger_set,
@@ -246,6 +264,7 @@ static const struct sensor_driver_api pmw33xx_driver_api = {
     // .attr_set = pmw33xx_attr_set,
     .sample_fetch = pmw33xx_sample_fetch,
     .channel_get = pmw33xx_channel_get,
+    .attr_set = pmw33xx_attr_set
 };
 
 static int pmw33xx_set_cpi(const struct device *dev, uint16_t cpi) {
@@ -332,6 +351,12 @@ static int pmw33xx_init_chip(const struct device *dev) {
 
     if (config->cpi > PMW33XX_CPI_MIN && config->cpi < PMW33XX_CPI_MAX)
         return pmw33xx_set_cpi(dev, config->cpi);
+
+    err = pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG1, 0x09);
+    if (err) {
+        LOG_ERR("failed to set resolution");
+        return err;
+    }
     return 0;
 }
 

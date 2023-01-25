@@ -13,16 +13,30 @@
 #include <stdlib.h>
 
 #define LAYER_THRESHOLD 10
+#define RESOLUTION_SETTING 0x9 // 0x29 max, 0x09 default
+#define RESOLUTION_SETTING_SCROLL 0x01
 
 LOG_MODULE_REGISTER(PMW33XX_MOUSE, CONFIG_ZMK_LOG_LEVEL);
 
 static int mode = DT_PROP(DT_INST(0, pixart_pmw33xx), mode);
 
-void zmk_pmw33xx_set_mode(int new_mode)
-{
+void zmk_pmw33xx_set_mode(int new_mode) {
+    struct sensor_value attr;
+    const struct device *dev;
+
+    const char *label = DT_LABEL(DT_INST(0, pixart_pmw33xx));
+    dev = device_get_binding(label);
+    if (dev == NULL) {
+        LOG_ERR("Cannot get TRACKBALL_PMW33XX device");
+        return;
+    }
+
     switch (new_mode) {
         case PMW33XX_MOVE:
         case PMW33XX_SCROLL:
+            if (new_mode == PMW33XX_MOVE) attr.val1 = RESOLUTION_SETTING;
+            else attr.val1 = RESOLUTION_SETTING_SCROLL;
+            sensor_attr_set(dev, SENSOR_CHAN_ALL, SENSOR_ATTR_SAMPLING_FREQUENCY, &attr);
             mode = new_mode;
             break;
 
@@ -30,6 +44,9 @@ void zmk_pmw33xx_set_mode(int new_mode)
             mode = mode == PMW33XX_MOVE
                    ? PMW33XX_SCROLL
                    : PMW33XX_MOVE;
+            if (mode == PMW33XX_MOVE) attr.val1 = RESOLUTION_SETTING;
+            else attr.val1 = RESOLUTION_SETTING_SCROLL;
+            sensor_attr_set(dev, SENSOR_CHAN_ALL, SENSOR_ATTR_SAMPLING_FREQUENCY, &attr);
             break;
 
        default:
@@ -89,7 +106,7 @@ static void thread_code(void *p1, void *p2, void *p3)
                 case PMW33XX_SCROLL: {
                     int dx = pos_dx.val1;
                     int dy = pos_dy.val1;
-                    zmk_hid_mouse_scroll_set(dx, dy);
+                    zmk_hid_mouse_scroll_set(dx, -dy);
                     send_report = true;
                     clear = PMW33XX_SCROLL;
                     break;
