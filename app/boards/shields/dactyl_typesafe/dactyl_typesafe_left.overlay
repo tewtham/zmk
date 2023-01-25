@@ -5,15 +5,15 @@
  */
 
 #include "dactyl_typesafe.dtsi"
+#include <dt-bindings/zmk/keys.h>
 
 &kscan0 {
 	row-gpios
 		= <&pro_micro 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 		, <&pro_micro 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-		, <&pro_micro 19 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+		, <&pro_micro 21 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 		, <&pro_micro 18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 		, <&pro_micro 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-		, <&pro_micro 1  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
 		;
 	col-gpios
 		= <&pro_micro 2 GPIO_ACTIVE_HIGH>
@@ -27,9 +27,20 @@
 
 
 / {
-	joystick {
+	joystick_x: joystick_x {
+    	compatible = "joystick";
+        status = "okay";
+        label = "JOYSTICK_X";
+		io-channels = <&adc 5>;
+		min_on = <70>;
+		reverse;
+    };
+	
+	joystick_y: joystick_y {
 		compatible = "joystick";
-		label = "JOYSTICK";
-		io-channels = <&adc 31>, <&adc 29>;
-	};
+		status = "okay";
+		label = "JOYSTICK_Y";
+		io-channels = <&adc 0>;
+		min_on = <70>;
+    };
 };

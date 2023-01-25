@@ -9,9 +9,6 @@ config JOYSTICK
 config ADC
 	default y
 
-config ADC_ASYNC
-	default y
-
 endif
 
 if SHIELD_DACTYL_TYPESAFE_RIGHT

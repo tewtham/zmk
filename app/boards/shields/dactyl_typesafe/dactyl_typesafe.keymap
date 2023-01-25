@@ -21,6 +21,7 @@
 &kp TAB   &kp Z     &kp X     &kp C     &kp V     &kp B                        &kp N      &kp M     &kp COMMA &kp DOT   &kp FSLH  &kp RCTRL
 &kp LSHFT &kp GRAVE &kp EQUAL &kp LALT                                                              &kp LBKT  &kp RBKT  &kp RALT  &kp RSHFT
 										&kp BSPC  &kp SPACE &kp DEL     &mo 1  &kp ENTER  &kp END
+&kp LCTRL &kp LSHIFT &kp LGUI &kp LALT
 			>;
 		};
 
@@ -31,6 +32,7 @@
 &trans    &trans    &trans    &trans    &trans    &trans                        &trans   &trans    &trans    &trans    &trans    &trans
 &trans    &trans    &trans    &trans                                                               &trans    &trans    &trans    &trans
 										&trans    &trans   &trans    &kp RSHFT  &trans   &trans
+&trans &trans &trans &trans
 			>;
 		};
 
@@ -41,6 +43,7 @@
 &trans    &trans    &trans    &trans    &trans    &trans                        &trans                  &trans    &trans    &trans    &trans    &trans
 &trans    &trans    &trans    &trans                                                                    &trans    &trans    &trans    &trans
 										&trans    &trans   &trans    &to 0  &trans   &trans
+&trans &trans &trans &trans
 			>;
 		};
 	};
