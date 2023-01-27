@@ -5,4 +5,4 @@ description: Momentary layer on press/release behavior
 
 compatible: "zmk,behavior-momentary-layer"
 
-include: one_param.yaml
+include: two_param.yaml

@@ -20,7 +20,7 @@
 &kp MINUS &kp A     &kp S     &kp D     &kp F     &kp G                        &kp H      &kp J     &kp K     &kp L     &kp SEMI  &kp SQT
 &kp TAB   &kp Z     &kp X     &kp C     &kp V     &kp B                        &kp N      &kp M     &kp COMMA &kp DOT   &kp FSLH  &kp RCTRL
 &kp LSHFT &kp GRAVE &kp EQUAL &kp LALT                                                              &kp LBKT  &kp RBKT  &kp RALT  &kp RSHFT
-										&kp BSPC  &kp SPACE &kp DEL     &mo 1  &kp ENTER  &kp END
+										&kp BSPC  &kp SPACE &kp DEL     &mo 1 0  &kp ENTER  &kp END
 &kp LCTRL &kp LSHIFT &kp LGUI &kp LALT
 			>;
 		};
@@ -42,7 +42,7 @@
 &trans    &trans    &kp LEFT  &kp DOWN  &kp RIGHT &trans                        &pmw33xx_toggle_toggle  &mkp LCLK &mkp MCLK &mkp RCLK &trans    &trans
 &trans    &trans    &trans    &trans    &trans    &trans                        &trans                  &trans    &trans    &trans    &trans    &trans
 &trans    &trans    &trans    &trans                                                                    &trans    &trans    &trans    &trans
-										&trans    &trans   &trans    &to 0  &trans   &trans
+										&trans    &trans   &trans    &mo 1 0  &trans   &trans
 &trans &trans &trans &trans
 			>;
 		};
