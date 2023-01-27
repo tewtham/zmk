@@ -15,6 +15,7 @@
 #define LAYER_THRESHOLD 10
 #define RESOLUTION_SETTING 0x9 // 0x29 max, 0x09 default
 #define RESOLUTION_SETTING_SCROLL 0x01
+#define SCROLL_ADJ 30.0f // when scrolling, we'll divide the movement by this much
 
 LOG_MODULE_REGISTER(PMW33XX_MOUSE, CONFIG_ZMK_LOG_LEVEL);
 
@@ -34,9 +35,6 @@ void zmk_pmw33xx_set_mode(int new_mode) {
     switch (new_mode) {
         case PMW33XX_MOVE:
         case PMW33XX_SCROLL:
-            if (new_mode == PMW33XX_MOVE) attr.val1 = RESOLUTION_SETTING;
-            else attr.val1 = RESOLUTION_SETTING_SCROLL;
-            sensor_attr_set(dev, SENSOR_CHAN_ALL, SENSOR_ATTR_SAMPLING_FREQUENCY, &attr);
             mode = new_mode;
             break;
 
@@ -44,9 +42,6 @@ void zmk_pmw33xx_set_mode(int new_mode) {
             mode = mode == PMW33XX_MOVE
                    ? PMW33XX_SCROLL
                    : PMW33XX_MOVE;
-            if (mode == PMW33XX_MOVE) attr.val1 = RESOLUTION_SETTING;
-            else attr.val1 = RESOLUTION_SETTING_SCROLL;
-            sensor_attr_set(dev, SENSOR_CHAN_ALL, SENSOR_ATTR_SAMPLING_FREQUENCY, &attr);
             break;
 
        default:
@@ -54,10 +49,15 @@ void zmk_pmw33xx_set_mode(int new_mode) {
     }
 }
 
+static int round(float num) {
+    return (int)(num < 0 ? (num - 0.5) : (num + 0.5));
+}
+
 static void thread_code(void *p1, void *p2, void *p3)
 {
     const struct device *dev;
     int result;
+    uint8_t xSkips = 0, ySkips = 0;
 
     /* PMW33XX trackball initialization. */
     const char *label = DT_LABEL(DT_INST(0, pixart_pmw33xx));
@@ -104,8 +104,15 @@ static void thread_code(void *p1, void *p2, void *p3)
                 }
 
                 case PMW33XX_SCROLL: {
-                    int dx = pos_dx.val1;
-                    int dy = pos_dy.val1;
+                    xSkips++;
+                    ySkips++;
+                    int dy = round((pos_dy.val1/SCROLL_ADJ) * ySkips);
+                    int dx = round((pos_dx.val1/SCROLL_ADJ) * xSkips);
+
+                    // if after adjusting the movement we're not at 0, reset skips
+                    if (dy != 0) ySkips = 0;
+                    if (dx != 0) xSkips = 0;
+
                     zmk_hid_mouse_scroll_set(dx, -dy);
                     send_report = true;
                     clear = PMW33XX_SCROLL;

@@ -2,7 +2,10 @@
   "files.associations": {
     "*.overlay": "dts",
     "*.keymap": "dts",
-    "pmw33xx.h": "c"
+    "pmw33xx.h": "c",
+    "stdlib.h": "c",
+    "keymap.h": "c",
+    "math.h": "c"
   },
   "python.formatting.provider": "black"
 }

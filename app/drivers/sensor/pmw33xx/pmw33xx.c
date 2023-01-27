@@ -352,7 +352,7 @@ static int pmw33xx_init_chip(const struct device *dev) {
     if (config->cpi > PMW33XX_CPI_MIN && config->cpi < PMW33XX_CPI_MAX)
         return pmw33xx_set_cpi(dev, config->cpi);
 
-    err = pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG1, 0x09);
+    err = pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG1, 0x0A);
     if (err) {
         LOG_ERR("failed to set resolution");
         return err;
