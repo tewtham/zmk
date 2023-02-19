@@ -30,13 +30,6 @@ LOG_MODULE_REGISTER(PMW33XX, CONFIG_SENSOR_LOG_LEVEL);
 #define PMW33XX_CPI_MIN                                                                            \
     COND_CODE_1(CONFIG_PMW33XX_3389, (PMW33XX_3389_CPI_MIN), (PMW33XX_3360_CPI_MIN))
 
-struct pmw33xx_motion_burst {
-    uint8_t motion;
-    uint8_t observation;
-    int16_t dx;
-    int16_t dy;
-} __attribute__((packed));
-
 static inline int pmw33xx_cs_select(const struct pmw33xx_gpio_dt_spec *cs_gpio_cfg,
                                     const uint8_t value) {
     return gpio_pin_set(cs_gpio_cfg->port, cs_gpio_cfg->pin, value);
@@ -142,43 +135,47 @@ static int pmw33xx_write_srom(const struct device *dev) {
     return err;
 }
 
-static int pmw33xx_read_motion_burst(const struct device *dev, struct pmw33xx_motion_burst *burst) {
+static int pmw33xx_read_motion(const struct device *dev, int16_t *dx, int16_t *dy) {
     struct pmw33xx_data *data = dev->data;
     const struct pmw33xx_config *cfg = dev->config;
     const struct spi_config *spi_cfg = &cfg->bus_cfg.spi_cfg->spi_conf;
     const struct pmw33xx_gpio_dt_spec *cs_gpio_cfg = &cfg->bus_cfg.spi_cfg->cs_spec;
 
-    uint8_t access[1] = {PMW33XX_REG_BURST};
-    struct spi_buf_set tx = {
-        .buffers =
-            &(struct spi_buf){
-                .buf = access,
-                .len = 1,
-            },
-        .count = 1,
-    };
-    struct spi_buf_set rx = {
-        .buffers =
-            &(struct spi_buf){
-                .buf = (uint8_t *)burst,
-                .len = sizeof(struct pmw33xx_motion_burst),
-            },
-        .count = 1,
-    };
-
-    pmw33xx_cs_select(cs_gpio_cfg, 0);
-
-    int err = spi_write(data->bus, spi_cfg, &tx);
-    k_sleep(K_USEC(35)); // tsrad motbr
+    int err = pmw33xx_write_reg(dev, PMW33XX_REG_MOTION, 0x01);
     if (err) {
-        pmw33xx_cs_select(cs_gpio_cfg, 1);
         return err;
     }
-    err = spi_read(data->bus, spi_cfg, &rx);
-    pmw33xx_cs_select(cs_gpio_cfg, 1);
-#ifdef CONFIG_PMW33XX_TRIGGER
-    pmw33xx_reset_motion(dev);
-#endif
+
+    uint8_t high, low;
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_MOTION, &high);
+    if (err) {
+        return err;
+    }
+
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DX_L, &low);
+    if (err) {
+        return err;
+    }
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DX_H, &high);
+    if (err) {
+        return err;
+    }
+    int16_t x = (int16_t)(high<<8 | low);
+
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DY_L, &low);
+    if (err) {
+        return err;
+    }
+    err = pmw33xx_read_reg(dev, PMW33XX_REG_DY_H, &high);
+    if (err) {
+        return err;
+    }
+    int16_t y = (int16_t)(high<<8 | low);
+
+    // apply bounds -127 - 127
+    *dx = MIN(MAX(x, -127), 127);
+    *dy = -1 * MIN(MAX(y, -127), 127);
+
     return err;
 }
 
@@ -204,19 +201,20 @@ int pmw33xx_spi_init(const struct device *dev) {
 
 static int pmw33xx_sample_fetch(const struct device *dev, enum sensor_channel chan) {
     struct pmw33xx_data *data = dev->data;
-    struct pmw33xx_motion_burst burst;
+    int16_t dx, dy;
 
     if (chan != SENSOR_CHAN_ALL && chan != SENSOR_CHAN_POS_DX && chan != SENSOR_CHAN_POS_DY)
         return -ENOTSUP;
 
-    int err = pmw33xx_read_motion_burst(dev, &burst);
+    int err = pmw33xx_read_motion(dev, &dx, &dy);
     if (err) {
         return err;
     }
+
     if (chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_POS_DX)
-        data->dx += burst.dx;
+        data->dx += dx;
     if (chan == SENSOR_CHAN_ALL || chan == SENSOR_CHAN_POS_DY)
-        data->dy += burst.dy;
+        data->dy += dy;
     return 0;
 }
 
@@ -240,6 +238,24 @@ static int pmw33xx_channel_get(const struct device *dev, enum sensor_channel cha
     return 0;
 }
 
+static int pmw33xx_attr_set(const struct device *dev, enum sensor_channel chan, enum sensor_attribute attr, const struct sensor_value *val) {
+    const struct pmw33xx_config *cfg = dev->config;
+    int err;
+    LOG_WRN("updating sensor attributes...");
+
+    switch (attr) {
+    case SENSOR_ATTR_SAMPLING_FREQUENCY:
+        LOG_DBG("setting resolution to %d", val->val1);
+        int err = pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG1, val->val1);
+        if (err) {
+            return err;
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 static const struct sensor_driver_api pmw33xx_driver_api = {
 #ifdef CONFIG_PMW33XX_TRIGGER
     .trigger_set = pmw33xx_trigger_set,
@@ -248,6 +264,7 @@ static const struct sensor_driver_api pmw33xx_driver_api = {
     // .attr_set = pmw33xx_attr_set,
     .sample_fetch = pmw33xx_sample_fetch,
     .channel_get = pmw33xx_channel_get,
+    .attr_set = pmw33xx_attr_set
 };
 
 static int pmw33xx_set_cpi(const struct device *dev, uint16_t cpi) {
@@ -285,18 +302,29 @@ static int pmw33xx_init_chip(const struct device *dev) {
         LOG_ERR("could not reset %d", err);
         return -EIO;
     }
+
     if (pid != PMW33XX_PID) {
         LOG_ERR("pid does not match expected: got (%x), expected(%x)", pid, PMW33XX_PID);
         return -EIO;
     }
-    pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG2,
-                      config->disable_rest ? 0x00 : PMW33XX_RESTEN); // set rest enable
+
+    int16_t a,b;
+    pmw33xx_read_motion(dev, &a, &b); // read and throwout initial motion data
+    uint8_t throw_away;
+    pmw33xx_read_reg(dev, PMW33XX_REG_DX_H, &throw_away);
+    pmw33xx_read_reg(dev, PMW33XX_REG_DX_L, &throw_away);
+    pmw33xx_read_reg(dev, PMW33XX_REG_DY_H, &throw_away);
+    pmw33xx_read_reg(dev, PMW33XX_REG_DY_L, &throw_away);
 
     err = pmw33xx_write_srom(dev);
     if (err) {
         LOG_ERR("could not upload srom %d", err);
         return -EIO;
     }
+
+    pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG2,
+                      config->disable_rest ? 0x00 : PMW33XX_RESTEN); // set rest enable
+
     uint8_t srom_run = 0x0;
     err = pmw33xx_read_reg(dev, PMW33XX_REG_OBSERVATION, &srom_run);
     if (err) {
@@ -320,11 +348,15 @@ static int pmw33xx_init_chip(const struct device *dev) {
     }
 
     pmw33xx_write_reg(dev, PMW33XX_REG_BURST, 0x01);
-    struct pmw33xx_motion_burst val;
-    pmw33xx_read_motion_burst(dev, &val); // read and throwout initial motion data
 
     if (config->cpi > PMW33XX_CPI_MIN && config->cpi < PMW33XX_CPI_MAX)
         return pmw33xx_set_cpi(dev, config->cpi);
+
+    err = pmw33xx_write_reg(dev, PMW33XX_REG_CONFIG1, 0x0A);
+    if (err) {
+        LOG_ERR("failed to set resolution");
+        return err;
+    }
     return 0;
 }
 

@@ -56,6 +56,7 @@
 
 /* Config Registers */
 #define PMW33XX_REG_CONFIG2 0x10
+#define PMW33XX_REG_CONFIG1 0x0F
 #define PMW33XX_REG_OBSERVATION 0x24
 #define PMW33XX_REG_DOUT_L 0x25
 #define PMW33XX_REG_DOUT_H 0x26
@@ -97,6 +98,7 @@ struct pmw33xx_config {
     const union pmw33xx_bus_cfg bus_cfg;
     bool disable_rest;
     int cpi;
+    uint8_t resolution;
 #if CONFIG_PMW33XX_TRIGGER
     struct pmw33xx_gpio_dt_spec motswk_spec;
 #endif // CONFIG_PMW33XX_TRIGGER
